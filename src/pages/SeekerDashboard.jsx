@@ -1,6 +1,6 @@
 const SeekerDashboard = () => {
   return (
-    <div className="container" style={{ padding: '64px' }}>
+    <div className="container page-placeholder">
       <h1>Seeker Dashboard</h1>
       <p className="muted">Seeker dashboard page — built in a later layer.</p>
     </div>
