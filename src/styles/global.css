@@ -192,9 +192,17 @@ button{font-family:inherit}
 .split .form-card h3{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
 .split .form-card .form-sub{color:var(--grey);font-size:14px;margin:0 0 28px}
 
+/* Checkbox row */
+.check-row{display:flex;align-items:center;gap:8px;margin-bottom:24px;font-size:13px;color:var(--grey)}
+.check-row .box{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;display:inline-block;flex-shrink:0}
+.form-foot{text-align:center;font-size:13px;color:var(--grey);margin:24px 0 0}
+.form-foot a{color:var(--primary);font-weight:600}
+.form-terms{font-size:11px;color:var(--grey);text-align:center;margin:14px 0 0;line-height:1.5}
+.form-terms a{color:var(--primary)}
+
 /* Role toggle */
 .role-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--bg);padding:5px;border-radius:10px;margin-bottom:24px}
-.role-opt{padding:14px;text-align:center;border-radius:8px;font-size:13px;font-weight:600;color:var(--grey);background:transparent;border:1px solid transparent}
+.role-opt{padding:14px;text-align:center;border-radius:8px;font-size:13px;font-weight:600;color:var(--grey);background:transparent;border:1px solid transparent;font-family:inherit;cursor:pointer}
 .role-opt.active{background:var(--accent-light);color:var(--primary);border-color:#BFD5FF}
 
 /* Progress steps */
