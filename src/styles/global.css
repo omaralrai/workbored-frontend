@@ -148,6 +148,33 @@ button{font-family:inherit}
 .search-strip .field .val{font-size:14px;color:var(--text);font-weight:500;display:flex;align-items:center;gap:8px}
 .search-strip .btn-search{margin-left:8px;background:var(--primary);color:#fff;font-weight:600;font-size:13px;padding:12px 22px;border-radius:8px;border:0}
 
+/* Job detail */
+.jd-head{display:flex;align-items:flex-start;gap:20px;justify-content:space-between}
+.jd-head .left{display:flex;gap:20px;align-items:flex-start}
+.jd-head h1{font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:-.02em}
+.jd-meta{font-size:13px;color:var(--grey);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.jd-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--grey)}
+.jd-meta .co-name{font-weight:600;color:var(--text)}
+.jd-tags{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+.jd-section{margin-top:32px}
+.jd-section h3{font-size:16px;font-weight:600;margin:0 0 12px;letter-spacing:-.01em}
+.jd-section p{font-size:14px;line-height:1.7;color:var(--text);margin:0 0 12px}
+.jd-section ul{margin:0;padding-left:20px;color:var(--text)}
+.jd-section ul li{font-size:14px;line-height:1.7;margin-bottom:6px}
+.co-logo.lg{width:64px;height:64px;font-size:24px;border-radius:14px}
+.co-logo.md{width:56px;height:56px;font-size:22px;border-radius:14px}
+.about-co{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px}
+.about-co .info{display:flex;gap:36px;flex-wrap:wrap;font-size:13px}
+.about-co .info .k{color:var(--grey);margin-bottom:2px;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.about-co .info .v{font-weight:600}
+.about-co .info .v.link{color:var(--primary)}
+.main.narrow{max-width:980px;margin:0 auto}
+@media (max-width: 640px){
+  .jd-head{flex-direction:column}
+  .about-co{grid-template-columns:1fr;text-align:center}
+  .about-co .info{justify-content:center}
+}
+
 /* Filter bar */
 .filter-bar{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:20px}
 .filter-bar .input{flex:1;border:0;padding:8px 12px;font-size:14px}
