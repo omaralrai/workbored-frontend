@@ -1,91 +1,140 @@
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
+import { useAuth } from '../context/AuthContext';
+import { getJob, getSeekerByUser, createApplication } from '../api/client';
 
 const ArrowIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M11 7L7.5 3.5M11 7L7.5 10.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" /></svg>
 );
 
+const lines = (text) => (text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+
 const JobDetail = () => {
   const { id } = useParams();
+  const { user } = useAuth();
+  const [job, setJob] = useState(null);
+  const [error, setError] = useState('');
+  const [applyState, setApplyState] = useState('idle');
+
+  useEffect(() => {
+    getJob(id)
+      .then(setJob)
+      .catch((err) => setError(err.message));
+  }, [id]);
+
+  const handleApply = async () => {
+    if (!user) {
+      setApplyState('signin');
+      return;
+    }
+
+    setApplyState('loading');
+    try {
+      const seeker = await getSeekerByUser(user.id);
+      await createApplication({ job_id: job.id, seeker_id: seeker.id });
+      setApplyState('done');
+    } catch (err) {
+      setApplyState('error');
+    }
+  };
+
+  if (error) {
+    return (
+      <>
+        <Navbar variant={user?.role === 'employer' ? 'employer' : 'seeker'} current="jobs" />
+        <main className="main no-side narrow">
+          <p className="muted">Couldn't load this job: {error}</p>
+        </main>
+      </>
+    );
+  }
+
+  if (!job) {
+    return (
+      <>
+        <Navbar variant={user?.role === 'employer' ? 'employer' : 'seeker'} current="jobs" />
+        <main className="main no-side narrow">
+          <p className="muted">Loading job…</p>
+        </main>
+      </>
+    );
+  }
+
+  const tags = (job.tags || '').split(',').map((t) => t.trim()).filter(Boolean);
 
   return (
     <>
-      <Navbar variant="seeker" current="jobs" user={{ initials: 'JD', name: 'John D.' }} />
+      <Navbar variant={user?.role === 'employer' ? 'employer' : 'seeker'} current="jobs" />
 
       <main className="main no-side narrow">
         <div className="card card-pad">
           <div className="jd-head">
             <div className="left">
-              <div className="co-logo lg">A</div>
+              <div className={`co-logo lg ${job.logo_color && job.logo_color !== 'blue' ? job.logo_color : ''}`}>{job.logo_initial}</div>
               <div>
-                <h1>Frontend Engineer</h1>
+                <h1>{job.title}</h1>
                 <div className="jd-meta">
-                  <span className="co-name">Aramex</span>
-                  <span className="dot"></span><span>Amman, Jordan</span>
-                  <span className="dot"></span><span>On-site</span>
-                  <span className="dot"></span><span>Posted 2 days ago</span>
+                  <span className="co-name">{job.company_name}</span>
+                  <span className="dot"></span><span>{job.location}</span>
+                  <span className="dot"></span><span>{job.work_mode}</span>
                 </div>
                 <div className="jd-tags">
-                  <span className="chip blue">Full-time</span>
-                  <span className="chip">React</span>
-                  <span className="chip">TypeScript</span>
-                  <span className="chip">Mid-level</span>
-                  <span className="chip">$28k – $36k</span>
+                  <span className="chip blue">{job.job_type}</span>
+                  {tags.map((tag) => <span className="chip" key={tag}>{tag}</span>)}
+                  {job.experience_level && <span className="chip">{job.experience_level}</span>}
+                  {job.salary_display && <span className="chip">{job.salary_display}</span>}
                 </div>
               </div>
             </div>
-            <Link className="btn btn-primary btn-lg" to="/seeker/applications">Apply Now <ArrowIcon /></Link>
+            {user?.role !== 'employer' && (
+              applyState === 'done'
+                ? <span className="badge approved">Applied ✓</span>
+                : <button className="btn btn-primary btn-lg" onClick={handleApply} disabled={applyState === 'loading'}>
+                    {applyState === 'loading' ? 'Applying…' : 'Apply Now'} <ArrowIcon />
+                  </button>
+            )}
           </div>
+
+          {applyState === 'signin' && <p className="form-error">Please sign in as a job seeker to apply.</p>}
+          {applyState === 'error' && <p className="form-error">Couldn't submit your application. You may have already applied.</p>}
 
           <div className="jd-section">
             <h3>About the Role</h3>
-            <p>We're looking for a Frontend Engineer to join Aramex's digital experiences team. You'll work alongside designers, backend engineers and product managers to ship customer-facing features used by millions of shippers every month — from tracking pages to the self-service portal.</p>
-            <p>This role is on-site in Amman with flexible hours. You'll own features end-to-end and have a direct line to the people using what you build.</p>
+            <p>{job.description}</p>
           </div>
 
-          <div className="jd-section">
-            <h3>Key Responsibilities</h3>
-            <ul>
-              <li>Build and maintain customer-facing React applications using TypeScript and modern tooling</li>
-              <li>Collaborate with designers to translate Figma into pixel-accurate, accessible interfaces</li>
-              <li>Partner with backend engineers on API contracts and data fetching patterns</li>
-              <li>Write unit and integration tests; participate in code review and design review</li>
-              <li>Investigate bugs reported by support and operations teams; ship fixes quickly</li>
-            </ul>
-          </div>
+          {job.responsibilities && (
+            <div className="jd-section">
+              <h3>Key Responsibilities</h3>
+              <ul>{lines(job.responsibilities).map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          )}
+
+          {job.requirements && (
+            <div className="jd-section">
+              <h3>Requirements</h3>
+              <ul>{lines(job.requirements).map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          )}
+
+          {job.benefits && (
+            <div className="jd-section">
+              <h3>Benefits</h3>
+              <ul>{lines(job.benefits).map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          )}
 
           <div className="jd-section">
-            <h3>Requirements</h3>
-            <ul>
-              <li>2+ years of professional React experience, ideally with TypeScript</li>
-              <li>Solid understanding of HTML, CSS, modern JS, and accessibility fundamentals</li>
-              <li>Comfortable working with REST APIs and asynchronous data flows</li>
-              <li>Experience with at least one component library (MUI, Chakra, Radix or similar)</li>
-              <li>Bachelor's degree in CS, SE or equivalent practical experience</li>
-            </ul>
-          </div>
-
-          <div className="jd-section">
-            <h3>Benefits</h3>
-            <ul>
-              <li>Competitive salary, paid in JOD with annual review</li>
-              <li>Private medical insurance for you and dependents</li>
-              <li>22 days annual leave + national holidays</li>
-              <li>Annual learning budget for courses, books, and conferences</li>
-              <li>Hybrid Friday option after the first 3 months</li>
-            </ul>
-          </div>
-
-          <div className="jd-section">
-            <h3>About Aramex</h3>
+            <h3>About {job.company_name}</h3>
             <div className="about-co">
-              <div className="co-logo md">A</div>
+              <div className={`co-logo md ${job.logo_color && job.logo_color !== 'blue' ? job.logo_color : ''}`}>{job.logo_initial}</div>
               <div className="info">
-                <div><div className="k">Industry</div><div className="v">Logistics</div></div>
-                <div><div className="k">Size</div><div className="v">5,000+ employees</div></div>
-                <div><div className="k">Founded</div><div className="v">1982</div></div>
-                <div><div className="k">HQ</div><div className="v">Amman, Jordan</div></div>
-                <div><div className="k">Website</div><div className="v link">aramex.com</div></div>
+                <div><div className="k">Industry</div><div className="v">{job.industry || '—'}</div></div>
+                <div><div className="k">Size</div><div className="v">{job.company_size || '—'}</div></div>
+                <div><div className="k">Founded</div><div className="v">{job.founded_year || '—'}</div></div>
+                <div><div className="k">HQ</div><div className="v">{job.headquarters || '—'}</div></div>
+                <div><div className="k">Website</div><div className="v link">{job.website || '—'}</div></div>
               </div>
             </div>
           </div>

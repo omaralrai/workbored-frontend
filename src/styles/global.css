@@ -638,3 +638,18 @@ hr.div{border:0;border-top:1px solid var(--border);margin:20px 0}
   .cta-inner{flex-direction:column;align-items:flex-start}
   .nav-links{display:none}
 }
+
+/* API integration helpers */
+.form-error{background:var(--red-bg);color:var(--red);font-size:13px;font-weight:600;padding:10px 14px;border-radius:8px;margin-bottom:14px}
+.form-row-head{justify-content:space-between}
+.forgot-link{font-size:12px;color:var(--primary);font-weight:600}
+.role-opt-inner{justify-content:center}
+.title-link{color:inherit}
+.apply-filters-btn{margin-bottom:8px}
+.meaning-col{width:30%}
+.feedback-col{width:24%}
+.feedback-wide-col{width:26%}
+.skill-add-row{display:flex;gap:8px;margin-bottom:14px}
+.skill-add-row .input{flex:1}
+.skill-remove{background:none;border:none;color:var(--primary);font-size:14px;font-weight:700;cursor:pointer;line-height:1;padding:0;margin-left:2px}
+.user-pill{cursor:pointer}
