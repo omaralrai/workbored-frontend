@@ -148,6 +148,74 @@ button{font-family:inherit}
 .search-strip .field .val{font-size:14px;color:var(--text);font-weight:500;display:flex;align-items:center;gap:8px}
 .search-strip .btn-search{margin-left:8px;background:var(--primary);color:#fff;font-weight:600;font-size:13px;padding:12px 22px;border-radius:8px;border:0}
 
+/* Utility */
+.muted{color:var(--grey)}
+
+/* Banners */
+.banner{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;font-size:13px;color:var(--text);margin-bottom:24px}
+.banner.green{background:var(--green-bg)}
+.banner-icon{width:24px;height:24px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* Card head row */
+.card-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)}
+.card-head .title{font-size:16px;font-weight:600}
+.card-head .sub{font-size:12px;color:var(--grey);margin-top:2px}
+.card-head .link{font-size:13px;color:var(--primary);font-weight:600}
+
+.co-logo.sm{width:32px;height:32px;font-size:13px;border-radius:8px}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;color:var(--grey);background:#fff;border:1px solid var(--border);cursor:pointer}
+.tab.active{color:var(--primary);background:var(--accent-light);border-color:transparent}
+.tab .count{background:rgba(0,0,0,.06);border-radius:6px;padding:1px 7px;font-size:11px}
+.tab.active .count{background:rgba(43,112,242,.15)}
+
+/* Profile */
+.progress{height:8px;background:var(--bg);border-radius:6px;overflow:hidden}
+.progress .b{height:100%;background:var(--primary);border-radius:6px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.info-cell{display:flex;flex-direction:column;gap:2px}
+.info-cell .k{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.info-cell .v{font-size:14px;font-weight:500}
+.skill-pill{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--primary);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-right:8px;margin-bottom:8px}
+.file-row{display:flex;align-items:center;gap:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px}
+.file-icon{width:40px;height:40px;border-radius:10px;background:var(--accent-light);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.file-row .name{font-weight:600;font-size:13px}
+.file-row .meta{font-size:12px;color:var(--grey);margin-top:2px}
+.file-row .body{flex:1}
+.no-fb{font-size:12px}
+.actions-col{text-align:right}
+.actions-col .btn + .btn{margin-left:8px}
+
+/* Modal extras */
+.modal-head-info{display:flex;gap:14px;align-items:center}
+.modal-logo{width:48px;height:48px}
+.modal-title{font-size:18px;font-weight:700}
+.modal-co{font-size:13px;color:var(--grey)}
+.modal-status-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding:12px 14px;background:var(--accent-light);border-radius:10px}
+.modal-status-eyebrow{font-size:11px;color:var(--primary);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.modal-status-text{font-size:14px;font-weight:600;margin-top:2px}
+.modal-actions{display:flex;gap:10px}
+
+/* Profile cards */
+.profile-completion{margin-bottom:20px}
+.completion-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.completion-label{font-size:14px;font-weight:600}
+.completion-pct{font-size:14px;font-weight:700;color:var(--primary)}
+.completion-hint{font-size:12px;color:var(--grey);margin-top:10px}
+.card-row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.card-row-title{font-size:15px;font-weight:600}
+.summary-title{margin-bottom:14px}
+.textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:inherit;font-size:13px;line-height:1.6;min-height:140px;resize:vertical}
+
+@media (max-width: 1024px){
+  .profile-grid,.info-grid{grid-template-columns:1fr}
+  .shell{flex-direction:column}
+  .sidebar{width:100%;border-right:0;border-bottom:1px solid var(--border)}
+}
+
 /* Job detail */
 .jd-head{display:flex;align-items:flex-start;gap:20px;justify-content:space-between}
 .jd-head .left{display:flex;gap:20px;align-items:flex-start}
