@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => (
   <footer className="foot">
+    <div className="container">
     <div className="foot-grid">
       <div className="foot-brand">
         <Link className="logo" to="/">
@@ -70,6 +71,7 @@ const Footer = () => (
     <div className="foot-bottom">
       <span>© 2026 WorkBored. Built at Al Hussein Technical University.</span>
       <span>Where Careers Begin.</span>
+    </div>
     </div>
   </footer>
 );

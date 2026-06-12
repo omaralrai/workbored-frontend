@@ -34,16 +34,18 @@ const Navbar = ({ variant = 'public', current, user }) => {
   if (variant === 'employer') {
     return (
       <nav className="navbar">
-        <Logo />
-        <div className="nav-links">
-          <Link to="/employer/dashboard" className={current === 'dashboard' ? 'current' : ''}>Dashboard</Link>
-          <Link to="/employer/jobs" className={current === 'jobs' ? 'current' : ''}>My Jobs</Link>
-          <Link to="/employer/applications" className={current === 'applications' ? 'current' : ''}>Applications</Link>
-          <Link to="/companies/me" className={current === 'company' ? 'current' : ''}>Company</Link>
-        </div>
-        <div className="nav-right">
-          <Link className="btn-post" to="/employer/post-job"><PlusIcon /> Post a Job</Link>
-          <UserPill user={user} employer />
+        <div className="container navbar-inner">
+          <Logo />
+          <div className="nav-links">
+            <Link to="/employer/dashboard" className={current === 'dashboard' ? 'current' : ''}>Dashboard</Link>
+            <Link to="/employer/jobs" className={current === 'jobs' ? 'current' : ''}>My Jobs</Link>
+            <Link to="/employer/applications" className={current === 'applications' ? 'current' : ''}>Applications</Link>
+            <Link to="/companies/me" className={current === 'company' ? 'current' : ''}>Company</Link>
+          </div>
+          <div className="nav-right">
+            <Link className="btn-post" to="/employer/post-job"><PlusIcon /> Post a Job</Link>
+            <UserPill user={user} employer />
+          </div>
         </div>
       </nav>
     );
@@ -52,15 +54,17 @@ const Navbar = ({ variant = 'public', current, user }) => {
   if (variant === 'seeker') {
     return (
       <nav className="navbar">
-        <Logo />
-        <div className="nav-links">
-          <Link to="/jobs" className={current === 'jobs' ? 'current' : ''}>Find Jobs</Link>
-          <Link to="/seeker/dashboard" className={current === 'dashboard' ? 'current' : ''}>Dashboard</Link>
-          <Link to="/seeker/applications" className={current === 'applications' ? 'current' : ''}>Applications</Link>
-          <Link to="/companies/me" className={current === 'companies' ? 'current' : ''}>Companies</Link>
-        </div>
-        <div className="nav-right">
-          <UserPill user={user} />
+        <div className="container navbar-inner">
+          <Logo />
+          <div className="nav-links">
+            <Link to="/jobs" className={current === 'jobs' ? 'current' : ''}>Find Jobs</Link>
+            <Link to="/seeker/dashboard" className={current === 'dashboard' ? 'current' : ''}>Dashboard</Link>
+            <Link to="/seeker/applications" className={current === 'applications' ? 'current' : ''}>Applications</Link>
+            <Link to="/companies/me" className={current === 'companies' ? 'current' : ''}>Companies</Link>
+          </div>
+          <div className="nav-right">
+            <UserPill user={user} />
+          </div>
         </div>
       </nav>
     );
@@ -68,12 +72,14 @@ const Navbar = ({ variant = 'public', current, user }) => {
 
   return (
     <nav className="navbar">
-      <Logo />
-      <div className="nav-links">
-        <Link to="/jobs">Find Jobs</Link>
-        <Link to="/companies/me">Companies</Link>
+      <div className="container navbar-inner">
+        <Logo />
+        <div className="nav-links">
+          <Link to="/jobs">Find Jobs</Link>
+          <Link to="/companies/me">Companies</Link>
+        </div>
+        <div className="nav-spacer" />
       </div>
-      <div className="nav-spacer" />
     </nav>
   );
 };
