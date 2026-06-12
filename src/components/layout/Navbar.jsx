@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const LogoMark = () => (
   <span className="logo-mark" aria-hidden="true">
@@ -15,14 +16,25 @@ const Logo = () => (
   </Link>
 );
 
-const UserPill = ({ user, employer }) => (
-  <div className="user-pill">
-    <span className={`user-avatar${employer ? ' employer' : ''}`}>
-      {user?.initials || '??'}
-    </span>
-    {user?.name || 'Account'} ▾
-  </div>
-);
+const initialsFromName = (name) => {
+  if (!name) return '??';
+  const parts = name.trim().split(/\s+/);
+  return parts.slice(0, 2).map((p) => p[0]?.toUpperCase()).join('');
+};
+
+const UserPill = ({ employer, onClick }) => {
+  const { user } = useAuth();
+  const displayName = user?.full_name?.split(' ')[0] || 'Account';
+
+  return (
+    <div className="user-pill" onClick={onClick} role="button">
+      <span className={`user-avatar${employer ? ' employer' : ''}`}>
+        {initialsFromName(user?.full_name)}
+      </span>
+      {displayName} ▾
+    </div>
+  );
+};
 
 const PlusIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -30,7 +42,15 @@ const PlusIcon = () => (
   </svg>
 );
 
-const Navbar = ({ variant = 'public', current, user }) => {
+const Navbar = ({ variant = 'public', current }) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAccountClick = () => {
+    logout();
+    navigate('/');
+  };
+
   if (variant === 'employer') {
     return (
       <nav className="navbar">
@@ -38,13 +58,12 @@ const Navbar = ({ variant = 'public', current, user }) => {
           <Logo />
           <div className="nav-links">
             <Link to="/employer/dashboard" className={current === 'dashboard' ? 'current' : ''}>Dashboard</Link>
-            <Link to="/employer/jobs" className={current === 'jobs' ? 'current' : ''}>My Jobs</Link>
             <Link to="/employer/applications" className={current === 'applications' ? 'current' : ''}>Applications</Link>
             <Link to="/companies/me" className={current === 'company' ? 'current' : ''}>Company</Link>
           </div>
           <div className="nav-right">
             <Link className="btn-post" to="/employer/post-job"><PlusIcon /> Post a Job</Link>
-            <UserPill user={user} employer />
+            <UserPill employer onClick={handleAccountClick} />
           </div>
         </div>
       </nav>
@@ -60,10 +79,9 @@ const Navbar = ({ variant = 'public', current, user }) => {
             <Link to="/jobs" className={current === 'jobs' ? 'current' : ''}>Find Jobs</Link>
             <Link to="/seeker/dashboard" className={current === 'dashboard' ? 'current' : ''}>Dashboard</Link>
             <Link to="/seeker/applications" className={current === 'applications' ? 'current' : ''}>Applications</Link>
-            <Link to="/companies/me" className={current === 'companies' ? 'current' : ''}>Companies</Link>
           </div>
           <div className="nav-right">
-            <UserPill user={user} />
+            <UserPill onClick={handleAccountClick} />
           </div>
         </div>
       </nav>
@@ -76,7 +94,6 @@ const Navbar = ({ variant = 'public', current, user }) => {
         <Logo />
         <div className="nav-links">
           <Link to="/jobs">Find Jobs</Link>
-          <Link to="/companies/me">Companies</Link>
         </div>
         <div className="nav-spacer" />
       </div>

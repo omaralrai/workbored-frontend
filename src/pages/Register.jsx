@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
+import { useAuth } from '../context/AuthContext';
 
 const LogoMark = () => (
   <svg width="44" height="44" viewBox="0 0 18 18" fill="none">
@@ -17,7 +18,35 @@ const EmployerIcon = () => (
 );
 
 const Register = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [role, setRole] = useState('seeker');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const user = await register({ email, password, role, full_name: fullName });
+      navigate(user.role === 'employer' ? '/employer/company-setup' : '/seeker/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -46,34 +75,35 @@ const Register = () => {
 
             <div className="role-toggle">
               <button type="button" className={`role-opt ${role === 'seeker' ? 'active' : ''}`} onClick={() => setRole('seeker')}>
-                <span className="row-flex" style={{ justifyContent: 'center' }}><SeekerIcon /> Job Seeker</span>
+                <span className="row-flex role-opt-inner"><SeekerIcon /> Job Seeker</span>
               </button>
               <button type="button" className={`role-opt ${role === 'employer' ? 'active' : ''}`} onClick={() => setRole('employer')}>
-                <span className="row-flex" style={{ justifyContent: 'center' }}><EmployerIcon /> Employer</span>
+                <span className="row-flex role-opt-inner"><EmployerIcon /> Employer</span>
               </button>
             </div>
 
-            <form>
+            <form onSubmit={handleSubmit}>
+              {error && <div className="form-error">{error}</div>}
               <div className="form-row">
                 <label>Full Name</label>
-                <input className="input" placeholder="John Doe" />
+                <input className="input" placeholder="John Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
               </div>
               <div className="form-row">
                 <label>Email Address</label>
-                <input className="input" type="email" placeholder="john.doe@university.edu" />
+                <input className="input" type="email" placeholder="john.doe@university.edu" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
               <div className="form-grid-2">
                 <div className="form-row">
                   <label>Password</label>
-                  <input className="input" type="password" placeholder="••••••••" />
+                  <input className="input" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
                 <div className="form-row">
                   <label>Confirm Password</label>
-                  <input className="input" type="password" placeholder="••••••••" />
+                  <input className="input" type="password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary btn-block btn-lg">Create Account</button>
+              <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={loading}>{loading ? 'Creating Account…' : 'Create Account'}</button>
             </form>
 
             <p className="form-terms">By creating an account you agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>

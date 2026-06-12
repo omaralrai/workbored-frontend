@@ -1,33 +1,58 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import SeekerSidebar from '../components/layout/SeekerSidebar';
+import { useAuth } from '../context/AuthContext';
+import { getSeekerByUser, getSeekerApplications, withdrawApplication } from '../api/client';
 
-const applications = [
-  { co: 'Aramex', logo: 'A', logoClass: '', title: 'Frontend Engineer', type: 'Full-time · Amman', applied: '2 days ago', status: 'interview', statusLabel: 'Interview', fb: { text: 'Interview Thu 10am — link in messages.', tone: 'blue' }, withdraw: false },
-  { co: 'Mawdoo3', logo: 'M', logoClass: 'green', title: 'UX Research Intern', type: 'Internship · Remote', applied: '5 days ago', status: 'review', statusLabel: 'Under Review', fb: { text: 'Strong portfolio — reviewing this week.', tone: 'orange' }, withdraw: false },
-  { co: 'Estarta', logo: 'E', logoClass: 'red', title: 'QA Engineer Intern', type: 'Internship · Amman', applied: '1 week ago', status: 'pending', statusLabel: 'Pending', fb: null, withdraw: true },
-  { co: 'Optimiza', logo: 'O', logoClass: 'orange', title: 'Junior Backend Developer', type: 'Full-time · Hybrid', applied: '2 weeks ago', status: 'approved', statusLabel: 'Approved', fb: { text: 'Offer sent — congratulations!', tone: 'green' }, withdraw: false },
-  { co: 'MenaITech', logo: 'M', logoClass: '', title: 'Mobile Developer Intern', type: 'Internship · Amman', applied: '3 weeks ago', status: 'rejected', statusLabel: 'Rejected', fb: { text: 'Looking for more iOS experience.', tone: 'red' }, withdraw: false },
-  { co: 'Hikma', logo: 'H', logoClass: 'orange', title: 'Data Analyst', type: 'Full-time · Amman', applied: '3 weeks ago', status: 'review', statusLabel: 'Under Review', fb: { text: 'Reviewed by hiring manager — decision soon.', tone: 'orange' }, withdraw: false },
-  { co: 'Aramex', logo: 'A', logoClass: '', title: 'Software Engineering Intern', type: 'Internship · Amman', applied: '4 weeks ago', status: 'pending', statusLabel: 'Pending', fb: null, withdraw: true },
-];
+const STATUS_META = {
+  pending: { cls: 'pending', label: 'Pending' },
+  under_review: { cls: 'review', label: 'Under Review' },
+  interview: { cls: 'interview', label: 'Interview' },
+  approved: { cls: 'approved', label: 'Approved' },
+  rejected: { cls: 'rejected', label: 'Rejected' },
+};
 
-const tabs = [
-  { label: 'All', count: 12, active: true },
-  { label: 'Pending', count: 6 },
-  { label: 'Under Review', count: 3 },
-  { label: 'Interview', count: 1 },
-  { label: 'Approved', count: 0 },
-  { label: 'Rejected', count: 2 },
-];
+const TAB_KEYS = ['All', 'Pending', 'Under Review', 'Interview', 'Approved', 'Rejected'];
+const TAB_STATUS = { Pending: 'pending', 'Under Review': 'under_review', Interview: 'interview', Approved: 'approved', Rejected: 'rejected' };
 
 const SeekerApplications = () => {
+  const { user } = useAuth();
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('All');
   const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    getSeekerByUser(user.id)
+      .then((seeker) => getSeekerApplications(seeker.id))
+      .then((apps) => setApplications(apps.filter((a) => !a.is_withdrawn)))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  const handleWithdraw = async (id) => {
+    try {
+      await withdrawApplication(id);
+      setApplications((prev) => prev.filter((a) => a.id !== id));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const counts = applications.reduce(
+    (acc, app) => ({ ...acc, [app.status]: (acc[app.status] || 0) + 1 }),
+    {}
+  );
+
+  const filtered = activeTab === 'All' ? applications : applications.filter((a) => a.status === TAB_STATUS[activeTab]);
 
   return (
     <>
-      <Navbar variant="seeker" current="applications" user={{ initials: 'JD', name: 'John D.' }} />
+      <Navbar variant="seeker" current="applications" />
 
       <div className="shell">
         <SeekerSidebar current="applications" />
@@ -41,32 +66,42 @@ const SeekerApplications = () => {
           </div>
 
           <div className="tabs">
-            {tabs.map((tab) => (
-              <div className={`tab ${tab.active ? 'active' : ''}`} key={tab.label}>{tab.label} <span className="count">{tab.count}</span></div>
+            {TAB_KEYS.map((tab) => (
+              <div className={`tab ${activeTab === tab ? 'active' : ''}`} key={tab} onClick={() => setActiveTab(tab)}>
+                {tab} <span className="count">{tab === 'All' ? applications.length : (counts[TAB_STATUS[tab]] || 0)}</span>
+              </div>
             ))}
           </div>
 
           <div className="card">
-            <table className="tbl">
-              <thead>
-                <tr><th>Company</th><th>Job Title</th><th>Applied</th><th>Status</th><th style={{ width: '24%' }}>Employer Feedback</th><th className="actions-col">Actions</th></tr>
-              </thead>
-              <tbody>
-                {applications.map((app, i) => (
-                  <tr key={i}>
-                    <td><div className="co-cell"><div className={`co-logo sm ${app.logoClass}`}>{app.logo}</div>{app.co}</div></td>
-                    <td><div className="cell-title">{app.title}</div><div className="cell-sub">{app.type}</div></td>
-                    <td className="muted">{app.applied}</td>
-                    <td><span className={`badge ${app.status}`}>{app.statusLabel}</span></td>
-                    <td>{app.fb ? <div className={`fb-note ${app.fb.tone}`}>{app.fb.text}</div> : <span className="muted no-fb">— No feedback yet</span>}</td>
-                    <td className="actions-col">
-                      <button className="btn btn-secondary btn-sm" onClick={() => setSelected(app)}>View Job</button>
-                      {app.withdraw && <button className="btn btn-danger btn-sm">Withdraw</button>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {loading && <p className="muted card-pad">Loading applications…</p>}
+            {error && <p className="muted card-pad">Couldn't load applications: {error}</p>}
+            {!loading && !error && filtered.length === 0 && <p className="muted card-pad">No applications in this category.</p>}
+            {!loading && !error && filtered.length > 0 && (
+              <table className="tbl">
+                <thead>
+                  <tr><th>Company</th><th>Job Title</th><th>Applied</th><th>Status</th><th className="feedback-col">Employer Feedback</th><th className="actions-col">Actions</th></tr>
+                </thead>
+                <tbody>
+                  {filtered.map((app) => {
+                    const meta = STATUS_META[app.status] || STATUS_META.pending;
+                    return (
+                      <tr key={app.id}>
+                        <td><div className="co-cell"><div className={`co-logo sm ${app.logo_color && app.logo_color !== 'blue' ? app.logo_color : ''}`}>{app.logo_initial}</div>{app.company_name}</div></td>
+                        <td><div className="cell-title">{app.job_title}</div><div className="cell-sub">{app.job_type} · {app.location}</div></td>
+                        <td className="muted">{new Date(app.applied_at).toLocaleDateString()}</td>
+                        <td><span className={`badge ${meta.cls}`}>{meta.label}</span></td>
+                        <td>{app.employer_feedback ? <div className="fb-note blue">{app.employer_feedback}</div> : <span className="muted no-fb">— No feedback yet</span>}</td>
+                        <td className="actions-col">
+                          <button className="btn btn-secondary btn-sm" onClick={() => setSelected(app)}>View Job</button>
+                          {app.status === 'pending' && <button className="btn btn-danger btn-sm" onClick={() => handleWithdraw(app.id)}>Withdraw</button>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
         </main>
       </div>
@@ -76,10 +111,10 @@ const SeekerApplications = () => {
           <div className="modal">
             <div className="modal-head">
               <div className="modal-head-info">
-                <div className={`co-logo modal-logo ${selected.logoClass}`}>{selected.logo}</div>
+                <div className={`co-logo modal-logo ${selected.logo_color && selected.logo_color !== 'blue' ? selected.logo_color : ''}`}>{selected.logo_initial}</div>
                 <div>
-                  <div className="modal-title">{selected.title}</div>
-                  <div className="modal-co">{selected.co}</div>
+                  <div className="modal-title">{selected.job_title}</div>
+                  <div className="modal-co">{selected.company_name}</div>
                 </div>
               </div>
               <button className="modal-close" onClick={() => setSelected(null)}>×</button>
@@ -88,19 +123,17 @@ const SeekerApplications = () => {
               <div className="modal-status-row">
                 <div>
                   <div className="modal-status-eyebrow">Your Application Status</div>
-                  <div className="modal-status-text">{selected.statusLabel} — applied {selected.applied}</div>
+                  <div className="modal-status-text">{(STATUS_META[selected.status] || STATUS_META.pending).label} — applied {new Date(selected.applied_at).toLocaleDateString()}</div>
                 </div>
-                <span className={`badge ${selected.status}`}>{selected.statusLabel}</span>
+                <span className={`badge ${(STATUS_META[selected.status] || STATUS_META.pending).cls}`}>{(STATUS_META[selected.status] || STATUS_META.pending).label}</span>
               </div>
-              <div className="modal-section"><h4>About the Role</h4><p>You'll join the team to ship customer-facing features end-to-end, from design to deploy.</p></div>
-              <div className="modal-section"><h4>Requirements</h4><ul><li>Relevant coursework or 1–2 years experience</li><li>Strong fundamentals in your stack</li><li>Good communication and ownership</li></ul></div>
               <div className="modal-section">
                 <h4>Employer Feedback</h4>
-                {selected.fb ? <div className={`fb-note ${selected.fb.tone}`}>{selected.fb.text}</div> : <div className="fb-note blue">No feedback yet.</div>}
+                {selected.employer_feedback ? <div className="fb-note blue">{selected.employer_feedback}</div> : <div className="fb-note blue">No feedback yet.</div>}
               </div>
               <div className="modal-actions">
                 <button className="btn btn-secondary" onClick={() => setSelected(null)}>Close</button>
-                <Link className="btn btn-primary" to="/jobs/1">Open Full Page →</Link>
+                <Link className="btn btn-primary" to={`/jobs/${selected.job_id}`}>Open Full Page →</Link>
               </div>
             </div>
           </div>
