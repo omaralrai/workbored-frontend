@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 
 const NotFound = () => {
   return (
-    <div className="container" style={{ padding: '64px', textAlign: 'center' }}>
+    <div className="container page-placeholder center">
       <h1>404</h1>
       <p className="muted">Page not found.</p>
-      <Link to="/" className="btn btn-primary" style={{ marginTop: '16px' }}>Go home</Link>
+      <Link to="/" className="btn btn-primary btn-home">Go home</Link>
     </div>
   );
 };
