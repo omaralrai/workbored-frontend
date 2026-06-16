@@ -17,10 +17,16 @@ import NotFound from './pages/NotFound';
 
 const ProtectedRoute = ({ role, children }) => {
   const { user } = useAuth();
-
   if (!user) return <Navigate to="/signin" replace />;
   if (role && user.role !== role) return <Navigate to="/" replace />;
+  return children;
+};
 
+// Redirect logged-in users away from public-only pages (home, signin, register)
+const GuestRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (user?.role === 'employer') return <Navigate to="/employer/dashboard" replace />;
+  if (user?.role === 'seeker') return <Navigate to="/seeker/dashboard" replace />;
   return children;
 };
 
@@ -29,9 +35,9 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<GuestRoute><Home /></GuestRoute>} />
+          <Route path="/signin" element={<GuestRoute><SignIn /></GuestRoute>} />
+          <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
           <Route path="/jobs" element={<JobListings />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/seeker/dashboard" element={<ProtectedRoute role="seeker"><SeekerDashboard /></ProtectedRoute>} />
