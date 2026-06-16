@@ -29,6 +29,20 @@ const PlusIcon = () => (
   </svg>
 );
 
+const HamburgerIcon = ({ open }) => (
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+    {open ? (
+      <>
+        <path d="M5 5L17 17M17 5L5 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </>
+    ) : (
+      <>
+        <path d="M3 6H19M3 11H19M3 16H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </>
+    )}
+  </svg>
+);
+
 const UserDropdown = ({ profilePath, employer }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -76,6 +90,18 @@ const UserDropdown = ({ profilePath, employer }) => {
 };
 
 const Navbar = ({ variant = 'public', current }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const closeMobile = () => setMobileOpen(false);
+
+  const handleMobileLogout = () => {
+    closeMobile();
+    logout();
+    navigate('/');
+  };
+
   if (variant === 'employer') {
     return (
       <nav className="navbar">
@@ -89,8 +115,21 @@ const Navbar = ({ variant = 'public', current }) => {
           <div className="nav-right">
             <Link className="btn-post" to="/employer/post-job"><PlusIcon /> Post a Job</Link>
             <UserDropdown profilePath="/companies/me" employer />
+            <button className="hamburger" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
+              <HamburgerIcon open={mobileOpen} />
+            </button>
           </div>
         </div>
+        {mobileOpen && (
+          <div className="mobile-nav">
+            <Link to="/employer/dashboard" className="mobile-nav-link" onClick={closeMobile}>Dashboard</Link>
+            <Link to="/employer/applications" className="mobile-nav-link" onClick={closeMobile}>Applications</Link>
+            <Link to="/companies/me" className="mobile-nav-link" onClick={closeMobile}>Company</Link>
+            <Link to="/employer/post-job" className="mobile-nav-link" onClick={closeMobile}>Post a Job</Link>
+            <Link to="/companies/me" className="mobile-nav-link" onClick={closeMobile}>View Profile</Link>
+            <button className="mobile-nav-link mobile-nav-link--danger" onClick={handleMobileLogout}>Sign Out</button>
+          </div>
+        )}
       </nav>
     );
   }
@@ -107,8 +146,20 @@ const Navbar = ({ variant = 'public', current }) => {
           </div>
           <div className="nav-right">
             <UserDropdown profilePath="/seeker/profile" />
+            <button className="hamburger" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
+              <HamburgerIcon open={mobileOpen} />
+            </button>
           </div>
         </div>
+        {mobileOpen && (
+          <div className="mobile-nav">
+            <Link to="/jobs" className="mobile-nav-link" onClick={closeMobile}>Find Jobs</Link>
+            <Link to="/seeker/dashboard" className="mobile-nav-link" onClick={closeMobile}>Dashboard</Link>
+            <Link to="/seeker/applications" className="mobile-nav-link" onClick={closeMobile}>Applications</Link>
+            <Link to="/seeker/profile" className="mobile-nav-link" onClick={closeMobile}>View Profile</Link>
+            <button className="mobile-nav-link mobile-nav-link--danger" onClick={handleMobileLogout}>Sign Out</button>
+          </div>
+        )}
       </nav>
     );
   }
@@ -123,8 +174,18 @@ const Navbar = ({ variant = 'public', current }) => {
         <div className="nav-right">
           <Link to="/signin" className="btn btn-ghost btn-sm">Sign In</Link>
           <Link to="/register" className="btn btn-primary btn-sm">Sign Up</Link>
+          <button className="hamburger" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
+            <HamburgerIcon open={mobileOpen} />
+          </button>
         </div>
       </div>
+      {mobileOpen && (
+        <div className="mobile-nav">
+          <Link to="/jobs" className="mobile-nav-link" onClick={closeMobile}>Find Jobs</Link>
+          <Link to="/signin" className="mobile-nav-link" onClick={closeMobile}>Sign In</Link>
+          <Link to="/register" className="mobile-nav-link" onClick={closeMobile}>Sign Up</Link>
+        </div>
+      )}
     </nav>
   );
 };

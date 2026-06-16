@@ -735,3 +735,117 @@ th.feedback-wide-col,td.feedback-wide-col{width:26%;max-width:26%}
 
 /* SignIn/Register polish */
 .form-row-head label{margin-bottom:0}
+
+/* ====== Bootstrap integration overrides ====== */
+/* Keep our custom badge styles intact — Bootstrap's .badge conflicts */
+.badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:5px;font-size:11px;font-weight:600;line-height:1}
+/* Job type badge using Bootstrap Badge component */
+.job-type-badge{background-color:var(--accent-light) !important;color:var(--primary) !important;font-size:11px !important;font-weight:600 !important;padding:4px 10px !important;border-radius:5px !important}
+/* Bootstrap Alert — keep our font */
+.alert{font-family:'Inter',sans-serif;font-size:13px;border-radius:8px}
+/* Listings loading state */
+.listings-loading{display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px 0;color:var(--grey)}
+/* Reset Bootstrap container interference */
+.container{max-width:1440px !important;margin:0 auto;width:100%;padding:0 clamp(20px,5vw,64px);box-sizing:border-box}
+
+/* ====== Mobile hamburger menu ====== */
+.hamburger{display:none;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;color:var(--text);align-items:center;justify-content:center;flex-shrink:0}
+.mobile-nav{position:absolute;top:64px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:200;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.mobile-nav-link{display:block;padding:14px 24px;font-size:14px;font-weight:500;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);background:none;border-left:none;border-right:none;border-top:none;text-align:left;font-family:inherit;cursor:pointer;width:100%}
+.mobile-nav-link:last-child{border-bottom:0}
+.mobile-nav-link:hover{background:var(--bg);color:var(--primary)}
+.mobile-nav-link--danger{color:#e53e3e}
+.mobile-nav-link--danger:hover{background:#fff5f5;color:#c53030}
+
+/* ====== Mobile / Phone responsive (<640px) ====== */
+@media (max-width: 640px){
+  /* Navbar: show hamburger, hide desktop links and user pill */
+  .hamburger{display:inline-flex}
+  .nav-links{display:none}
+  .nav-right .user-pill,.nav-right .btn-post,.nav-right .btn,.nav-right .user-dropdown{display:none}
+  .navbar{position:sticky}
+
+  /* Hero */
+  .hero{padding:48px 0 56px}
+  .hero h1{font-size:32px}
+  .hero .subtitle{font-size:14px}
+  .hero-inner{grid-template-columns:1fr;gap:32px}
+  .hero-illu{display:none}
+  .search{grid-template-columns:1fr;border-radius:10px}
+  .search .field{border-right:0;border-bottom:1px solid var(--border)}
+  .search .field:last-of-type{border-bottom:0}
+  .hero-stats{gap:24px}
+  .hero-stats .stat .num{font-size:22px}
+
+  /* Sidebar */
+  .shell{flex-direction:column}
+  .sidebar{width:100%;border-right:0;border-bottom:1px solid var(--border);padding:12px 16px}
+  .side-section{display:none}
+  .main{padding:16px 16px 48px}
+  .main.no-side{padding-left:16px;padding-right:16px}
+
+  /* Cards and grids */
+  .stat-row.s4,.stat-row.s5{grid-template-columns:1fr 1fr}
+  .dash-grid{grid-template-columns:1fr}
+  .profile-grid,.info-grid{grid-template-columns:1fr}
+  .form-grid-2,.form-grid-3{grid-template-columns:1fr}
+  .about-co{grid-template-columns:1fr;text-align:center}
+  .about-co .info{justify-content:center}
+  .vp-grid,.roles-grid{grid-template-columns:1fr}
+  .lc-flow{grid-template-columns:1fr}
+  .jobs-grid{grid-template-columns:1fr}
+  .co-meta{flex-direction:column;gap:6px}
+
+  /* Job cards */
+  .job-card{flex-direction:column;gap:12px}
+  .job-card .head{flex-direction:column;align-items:flex-start;gap:10px}
+  .job-card .head .btn{align-self:flex-start}
+
+  /* Tables */
+  .tbl{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+
+  /* Listings */
+  .listings-shell{grid-template-columns:1fr}
+  .filters{order:2}
+  .search-strip{grid-template-columns:1fr;gap:0;border-radius:10px}
+  .search-strip .field{border-right:0;border-bottom:1px solid var(--border);padding:10px 14px}
+  .search-strip .field:last-of-type{border-bottom:0}
+  .search-strip .btn-search{margin:8px;border-radius:8px;width:calc(100% - 16px)}
+
+  /* Auth split screens */
+  .split{grid-template-columns:1fr;min-height:auto}
+  .split .left{display:none}
+  .split .right{padding:32px 20px;align-items:flex-start}
+  .split .form-card{max-width:100%}
+  .split .form-card h3{font-size:22px}
+
+  /* Post-job steps */
+  .steps{flex-wrap:wrap;gap:10px}
+  .step-line{display:none}
+
+  /* Company header */
+  .co-header{flex-direction:column;text-align:center}
+
+  /* CTA band */
+  .cta-inner{flex-direction:column;align-items:flex-start;gap:24px}
+  .cta-inner h2{font-size:26px}
+  .cta-actions{flex-direction:column;width:100%}
+  .cta-actions .btn-primary,.cta-actions .btn-ghost{width:100%;justify-content:center}
+
+  /* Footer */
+  .foot-grid{grid-template-columns:1fr;gap:32px}
+  .foot-bottom{flex-direction:column;gap:12px;text-align:center}
+
+  /* App panel */
+  .app-panel{width:100%}
+  .app-panel-info-grid{grid-template-columns:1fr}
+
+  /* Page head */
+  .page-head{flex-direction:column;align-items:flex-start;gap:12px}
+
+  /* Tabs wrap */
+  .tabs{flex-wrap:wrap}
+
+  /* Section titles */
+  .section-title{font-size:26px}
+}
