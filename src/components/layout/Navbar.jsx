@@ -95,7 +95,10 @@ const Navbar = ({ variant = 'public', current }) => {
         <div className="nav-links">
           <Link to="/jobs">Find Jobs</Link>
         </div>
-        <div className="nav-spacer" />
+        <div className="nav-right">
+          <Link to="/signin" className="btn btn-ghost btn-sm">Sign In</Link>
+          <Link to="/register" className="btn btn-primary btn-sm">Sign Up</Link>
+        </div>
       </div>
     </nav>
   );
