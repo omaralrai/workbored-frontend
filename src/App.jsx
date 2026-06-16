@@ -10,6 +10,7 @@ import SeekerProfile from './pages/SeekerProfile';
 import SeekerApplications from './pages/SeekerApplications';
 import EmployerDashboard from './pages/EmployerDashboard';
 import EmployerApplications from './pages/EmployerApplications';
+import EmployerJobs from './pages/EmployerJobs';
 import PostJob from './pages/PostJob';
 import CompanyProfile from './pages/CompanyProfile';
 import CompanySetup from './pages/CompanySetup';
@@ -45,6 +46,7 @@ function App() {
           <Route path="/seeker/applications" element={<ProtectedRoute role="seeker"><SeekerApplications /></ProtectedRoute>} />
           <Route path="/employer/dashboard" element={<ProtectedRoute role="employer"><EmployerDashboard /></ProtectedRoute>} />
           <Route path="/employer/applications" element={<ProtectedRoute role="employer"><EmployerApplications /></ProtectedRoute>} />
+          <Route path="/employer/jobs" element={<ProtectedRoute role="employer"><EmployerJobs /></ProtectedRoute>} />
           <Route path="/employer/post-job" element={<ProtectedRoute role="employer"><PostJob /></ProtectedRoute>} />
           <Route path="/employer/company-setup" element={<ProtectedRoute role="employer"><CompanySetup /></ProtectedRoute>} />
           <Route path="/companies/:id" element={<CompanyProfile />} />

@@ -52,3 +52,11 @@ export const getSeekerByUser = (userId) => get(`/seekers/user/${userId}`);
 export const updateSeeker = (id, payload) => put(`/seekers/${id}`, payload);
 export const addSeekerSkill = (id, skillName) => post(`/seekers/${id}/skills`, { skill_name: skillName });
 export const removeSeekerSkill = (id, skillId) => del(`/seekers/${id}/skills/${skillId}`);
+export const uploadResume = async (seekerId, file) => {
+  const form = new FormData();
+  form.append('resume', file);
+  const res = await fetch(`${API_BASE}/seekers/${seekerId}/resume`, { method: 'POST', body: form });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.message || 'Upload failed');
+  return data;
+};

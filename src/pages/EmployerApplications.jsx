@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '../components/layout/Navbar';
 import EmployerSidebar from '../components/layout/EmployerSidebar';
 import { useAuth } from '../context/AuthContext';
-import { getCompanyByUser, getCompanyApplications, updateApplication } from '../api/client';
+import { getCompanyByUser, getCompanyApplications, updateApplication, getSeeker } from '../api/client';
 
 const STATUS_META = {
   pending: { cls: 'pending', label: 'Pending' },
@@ -28,12 +28,109 @@ const NEXT_ACTIONS = {
   ],
 };
 
+const initials = (name) => {
+  if (!name) return '??';
+  return name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join('');
+};
+
+const FileIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <path d="M4 2H10L14 6V16H4V2Z" stroke="currentColor" strokeWidth="1.4" />
+    <path d="M10 2V6H14" stroke="currentColor" strokeWidth="1.4" />
+  </svg>
+);
+
+const ApplicantPanel = ({ seeker, onClose }) => {
+  if (!seeker) return null;
+
+  return (
+    <div className="app-panel-overlay" onClick={onClose}>
+      <div className="app-panel" onClick={(e) => e.stopPropagation()}>
+        <button className="app-panel-close" onClick={onClose}>✕</button>
+
+        <div className="app-panel-hero">
+          <div className="app-panel-av">{initials(seeker.full_name)}</div>
+          <div>
+            <div className="app-panel-name">{seeker.full_name}</div>
+            <div className="app-panel-jobtitle">{seeker.job_title || 'No job title set'}</div>
+          </div>
+        </div>
+
+        <div className="app-panel-section">
+          <div className="app-panel-section-title">Contact & Info</div>
+          <div className="app-panel-info-grid">
+            <div className="app-panel-info-cell">
+              <div className="k">Email</div>
+              <div className="v">{seeker.email || '—'}</div>
+            </div>
+            <div className="app-panel-info-cell">
+              <div className="k">Phone</div>
+              <div className="v">{seeker.phone || '—'}</div>
+            </div>
+            <div className="app-panel-info-cell">
+              <div className="k">Location</div>
+              <div className="v">{seeker.location || '—'}</div>
+            </div>
+            <div className="app-panel-info-cell">
+              <div className="k">LinkedIn</div>
+              <div className="v">{seeker.linkedin_url || '—'}</div>
+            </div>
+          </div>
+        </div>
+
+        {(seeker.skills?.length > 0) && (
+          <div className="app-panel-section">
+            <div className="app-panel-section-title">Skills</div>
+            <div className="app-panel-skills">
+              {seeker.skills.map((s) => (
+                <span className="app-panel-skill" key={s.id}>{s.skill_name}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {seeker.professional_summary && (
+          <div className="app-panel-section">
+            <div className="app-panel-section-title">Professional Summary</div>
+            <p className="app-panel-summary">{seeker.professional_summary}</p>
+          </div>
+        )}
+
+        <div className="app-panel-section">
+          <div className="app-panel-section-title">Resume / CV</div>
+          {seeker.resume ? (
+            <div className="app-panel-resume">
+              <FileIcon />
+              <div>
+                <div style={{ fontSize: '13px', fontWeight: 500 }}>{seeker.resume.filename}</div>
+                <div className="meta">{seeker.resume.file_size_kb} KB · Uploaded {new Date(seeker.resume.uploaded_at).toLocaleDateString()}</div>
+              </div>
+              <a
+                href={`http://localhost:5000${seeker.resume.file_path}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--primary)', fontWeight: 600 }}
+              >
+                Download
+              </a>
+            </div>
+          ) : (
+            <p className="muted" style={{ fontSize: '13px' }}>No resume uploaded.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const EmployerApplications = () => {
   const { user } = useAuth();
   const [applicants, setApplicants] = useState([]);
   const [feedback, setFeedback] = useState({});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [panelSeeker, setPanelSeeker] = useState(null);
+  const [panelLoading, setPanelLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -62,6 +159,19 @@ const EmployerApplications = () => {
       setApplicants((prev) => prev.map((a) => (a.id === app.id ? { ...a, ...updated } : a)));
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleViewApplicant = async (seekerId) => {
+    setPanelLoading(true);
+    setPanelSeeker(null);
+    try {
+      const data = await getSeeker(seekerId);
+      setPanelSeeker(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setPanelLoading(false);
     }
   };
 
@@ -96,7 +206,14 @@ const EmployerApplications = () => {
             {!loading && !error && applicants.length > 0 && (
               <table className="tbl">
                 <thead>
-                  <tr><th>Applicant</th><th>Applied For</th><th>Date</th><th>Status</th><th className="feedback-wide-col">Feedback to Applicant</th><th className="actions-col">Actions</th></tr>
+                  <tr>
+                    <th>Applicant</th>
+                    <th>Applied For</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th className="feedback-wide-col">Feedback to Applicant</th>
+                    <th className="actions-col">Actions</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {applicants.map((a) => {
@@ -108,8 +225,16 @@ const EmployerApplications = () => {
                       <tr key={a.id}>
                         <td>
                           <div className="co-cell">
-                            <div className="av">{a.seeker_name?.split(' ').map((n) => n[0]).slice(0, 2).join('')}</div>
-                            <div><div className="cell-title">{a.seeker_name}</div></div>
+                            <div className="av">{initials(a.seeker_name)}</div>
+                            <div>
+                              <div className="cell-title">{a.seeker_name}</div>
+                              <button
+                                className="view-link"
+                                onClick={() => handleViewApplicant(a.seeker_id)}
+                              >
+                                View Application →
+                              </button>
+                            </div>
                           </div>
                         </td>
                         <td>{a.job_title}</td>
@@ -142,6 +267,18 @@ const EmployerApplications = () => {
           <p className="footnote">Status changes are reflected immediately on the applicant's dashboard as in-app feedback. No emails are sent.</p>
         </main>
       </div>
+
+      {panelLoading && (
+        <div className="app-panel-overlay">
+          <div className="app-panel" style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <p className="muted">Loading applicant…</p>
+          </div>
+        </div>
+      )}
+
+      {panelSeeker && !panelLoading && (
+        <ApplicantPanel seeker={panelSeeker} onClose={() => setPanelSeeker(null)} />
+      )}
     </>
   );
 };

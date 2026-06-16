@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -22,35 +23,59 @@ const initialsFromName = (name) => {
   return parts.slice(0, 2).map((p) => p[0]?.toUpperCase()).join('');
 };
 
-const UserPill = ({ employer, onClick }) => {
-  const { user } = useAuth();
-  const displayName = user?.full_name?.split(' ')[0] || 'Account';
-
-  return (
-    <div className="user-pill" onClick={onClick} role="button">
-      <span className={`user-avatar${employer ? ' employer' : ''}`}>
-        {initialsFromName(user?.full_name)}
-      </span>
-      {displayName} ▾
-    </div>
-  );
-};
-
 const PlusIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
     <path d="M7 2.5V11.5M2.5 7H11.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
   </svg>
 );
 
-const Navbar = ({ variant = 'public', current }) => {
-  const { logout } = useAuth();
+const UserDropdown = ({ profilePath, employer }) => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
-  const handleAccountClick = () => {
+  const displayName = user?.full_name?.split(' ')[0] || 'Account';
+  const initials = initialsFromName(user?.full_name);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
     logout();
     navigate('/');
   };
 
+  return (
+    <div className="user-dropdown" ref={ref}>
+      <div className="user-pill" onClick={() => setOpen((o) => !o)} role="button">
+        <span className={`user-avatar${employer ? ' employer' : ''}`}>{initials}</span>
+        {displayName} ▾
+      </div>
+      {open && (
+        <div className="user-dropdown-menu">
+          <Link
+            to={profilePath}
+            className="dropdown-item"
+            onClick={() => setOpen(false)}
+          >
+            View Profile
+          </Link>
+          <button className="dropdown-item dropdown-item-danger" onClick={handleLogout}>
+            Sign Out
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Navbar = ({ variant = 'public', current }) => {
   if (variant === 'employer') {
     return (
       <nav className="navbar">
@@ -63,7 +88,7 @@ const Navbar = ({ variant = 'public', current }) => {
           </div>
           <div className="nav-right">
             <Link className="btn-post" to="/employer/post-job"><PlusIcon /> Post a Job</Link>
-            <UserPill employer onClick={handleAccountClick} />
+            <UserDropdown profilePath="/companies/me" employer />
           </div>
         </div>
       </nav>
@@ -81,7 +106,7 @@ const Navbar = ({ variant = 'public', current }) => {
             <Link to="/seeker/applications" className={current === 'applications' ? 'current' : ''}>Applications</Link>
           </div>
           <div className="nav-right">
-            <UserPill onClick={handleAccountClick} />
+            <UserDropdown profilePath="/seeker/profile" />
           </div>
         </div>
       </nav>

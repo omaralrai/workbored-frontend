@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Navbar from '../components/layout/Navbar';
 import SeekerSidebar from '../components/layout/SeekerSidebar';
 import { useAuth } from '../context/AuthContext';
-import { getSeekerByUser, updateSeeker, addSeekerSkill, removeSeekerSkill } from '../api/client';
+import { getSeekerByUser, updateSeeker, addSeekerSkill, removeSeekerSkill, uploadResume } from '../api/client';
 
 const FileIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2H10L14 6V16H4V2Z" stroke="currentColor" strokeWidth="1.4" /><path d="M10 2V6H14" stroke="currentColor" strokeWidth="1.4" /></svg>
@@ -22,7 +22,11 @@ const SeekerProfile = () => {
   const [form, setForm] = useState({});
   const [newSkill, setNewSkill] = useState('');
   const [summary, setSummary] = useState('');
-  const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
+  const [saveError, setSaveError] = useState('');
+  const [saveOk, setSaveOk] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (!user) return;
@@ -38,7 +42,7 @@ const SeekerProfile = () => {
         });
         setSummary(data.professional_summary || '');
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => setLoadError(err.message));
   }, [user]);
 
   const completion = () => {
@@ -49,6 +53,8 @@ const SeekerProfile = () => {
   };
 
   const handleSaveInfo = async () => {
+    setSaveError('');
+    setSaveOk('');
     try {
       const updated = await updateSeeker(seeker.id, {
         job_title: form.job_title,
@@ -59,12 +65,15 @@ const SeekerProfile = () => {
       });
       setSeeker((prev) => ({ ...prev, ...updated }));
       setEditing(false);
+      setSaveOk('Profile saved!');
     } catch (err) {
-      setError(err.message);
+      setSaveError(err.message);
     }
   };
 
   const handleSaveSummary = async () => {
+    setSaveError('');
+    setSaveOk('');
     try {
       const updated = await updateSeeker(seeker.id, {
         job_title: seeker.job_title,
@@ -74,19 +83,21 @@ const SeekerProfile = () => {
         professional_summary: summary,
       });
       setSeeker((prev) => ({ ...prev, ...updated }));
+      setSaveOk('Summary saved!');
     } catch (err) {
-      setError(err.message);
+      setSaveError(err.message);
     }
   };
 
   const handleAddSkill = async () => {
     if (!newSkill.trim()) return;
+    setSaveError('');
     try {
       const skill = await addSeekerSkill(seeker.id, newSkill.trim());
       setSeeker((prev) => ({ ...prev, skills: [...(prev.skills || []), skill] }));
       setNewSkill('');
     } catch (err) {
-      setError(err.message);
+      setSaveError(err.message);
     }
   };
 
@@ -95,11 +106,29 @@ const SeekerProfile = () => {
       await removeSeekerSkill(seeker.id, skillId);
       setSeeker((prev) => ({ ...prev, skills: prev.skills.filter((s) => s.id !== skillId) }));
     } catch (err) {
-      setError(err.message);
+      setSaveError(err.message);
     }
   };
 
-  if (error) return <p className="muted card-pad">Couldn't load profile: {error}</p>;
+  const handleResumeChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    setSaveError('');
+    setSaveOk('');
+    try {
+      const resume = await uploadResume(seeker.id, file);
+      setSeeker((prev) => ({ ...prev, resume }));
+      setSaveOk('Resume uploaded!');
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  if (loadError) return <p className="muted card-pad">Couldn't load profile: {loadError}</p>;
   if (!seeker) return <p className="muted card-pad">Loading profile…</p>;
 
   return (
@@ -116,6 +145,9 @@ const SeekerProfile = () => {
               <p className="page-sub">Keep your profile up to date — it's what employers see.</p>
             </div>
           </div>
+
+          {saveError && <p style={{ color: '#e53e3e', marginBottom: '12px', fontSize: '13px' }}>{saveError}</p>}
+          {saveOk && <p style={{ color: '#38a169', marginBottom: '12px', fontSize: '13px' }}>{saveOk}</p>}
 
           <div className="card card-pad profile-completion">
             <div className="completion-head">
@@ -170,6 +202,20 @@ const SeekerProfile = () => {
             <div className="card card-pad">
               <div className="card-row-head">
                 <div className="card-row-title">Resume / CV</div>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? 'Uploading…' : seeker.resume ? 'Replace' : 'Upload Resume'}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  style={{ display: 'none' }}
+                  onChange={handleResumeChange}
+                />
               </div>
               {seeker.resume ? (
                 <div className="file-row">
@@ -180,7 +226,7 @@ const SeekerProfile = () => {
                   </div>
                 </div>
               ) : (
-                <p className="muted">No resume uploaded yet.</p>
+                <p className="muted">No resume uploaded yet. Click "Upload Resume" to add one.</p>
               )}
             </div>
 
