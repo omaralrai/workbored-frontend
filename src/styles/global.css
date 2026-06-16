@@ -653,3 +653,57 @@ hr.div{border:0;border-top:1px solid var(--border);margin:20px 0}
 .skill-add-row .input{flex:1}
 .skill-remove{background:none;border:none;color:var(--primary);font-size:14px;font-weight:700;cursor:pointer;line-height:1;padding:0;margin-left:2px}
 .user-pill{cursor:pointer}
+
+/* Styling polish — Task #10 */
+
+/* Generic .input base (catches inputs outside .form-row, e.g. skill edit in profile) */
+.input{border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-size:14px;background:#fff;font-family:inherit;color:var(--text);width:100%}
+.input:focus{outline:2px solid var(--primary);outline-offset:0;border-color:transparent}
+
+/* General .card-title */
+.card-title{font-size:15px;font-weight:600;margin-bottom:18px}
+
+/* Disabled button polish */
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+
+/* select.input — keep native arrow, normalise appearance */
+select.input{padding-right:36px;cursor:pointer}
+
+/* Page-head responsive wrap */
+@media (max-width: 768px) {
+  .page-head{flex-wrap:wrap;gap:12px}
+  .form-grid-2{grid-template-columns:1fr}
+  .form-grid-3{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:1fr}
+  .stat-row.s4,.stat-row.s5{grid-template-columns:repeat(2,1fr)}
+  .search-strip{grid-template-columns:1fr;gap:4px}
+  .search-strip .field{border-right:0;border-bottom:1px solid var(--border)}
+  .search-strip .field:last-of-type{border-bottom:0}
+  .jd-head{flex-direction:column;gap:14px}
+  .jd-head .left{flex-direction:column;gap:12px}
+  .steps{flex-wrap:wrap;gap:10px}
+  .step-line{display:none}
+}
+
+/* Loading/empty state message inside a card */
+.muted.card-pad{padding:24px;display:block}
+
+/* Ensure .input inside .info-cell (profile edit mode) looks correct */
+.info-cell .input{padding:8px 12px;font-size:13px;margin-top:2px}
+
+/* Skill pill with remove */
+.skill-pill{position:relative}
+
+/* Table th for meaning/feedback cols */
+th.meaning-col,td.meaning-col{width:30%;max-width:30%}
+th.feedback-col,td.feedback-col{width:24%;max-width:24%}
+th.feedback-wide-col,td.feedback-wide-col{width:26%;max-width:26%}
+
+/* Prevent tbl overflow on small screens */
+@media (max-width: 768px) {
+  .tbl{display:block;overflow-x:auto;white-space:nowrap}
+  .shell{flex-direction:column}
+}
+
+/* SignIn/Register polish */
+.form-row-head label{margin-bottom:0}
