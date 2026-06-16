@@ -1,16 +1,85 @@
-# React + Vite
+# 🌐 WorkBored Frontend (React)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **frontend** for WorkBored — a full-stack job board web application built with **React + Vite**.
 
-Currently, two official plugins are available:
+## 🎯 Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The app allows two types of users:
 
-## React Compiler
+- 👤 **Job Seekers:**
+  - Browse all active job listings
+  - View job details and apply
+  - Track application statuses in a personal dashboard
+  - Manage their profile and skills
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 🏢 **Employers:**
+  - Post and manage job listings
+  - Review applications and update statuses
+  - Add feedback for each applicant
+  - Manage their company profile
 
-## Expanding the ESLint configuration
+Login and signup are included with role-based routing (`seeker` / `employer`). Sessions are persisted using `localStorage`. Data is fetched from the Express backend via the Fetch API.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🧑‍💻 User Requirements
+
+1. **Login or Sign Up** with an email and password
+2. On sign up, choose your role: `seeker` or `employer`
+3. **Employer** users can:
+   - Post new job listings
+   - Edit or close existing listings
+   - Review applicants and move them through statuses
+4. **Seeker** users can:
+   - Browse and apply to jobs
+   - Withdraw pending applications
+   - Update their profile, skills, and professional summary
+5. The app remembers login sessions using `localStorage`
+
+---
+
+## 🛠️ Technologies
+
+- React 18
+- Vite
+- React Router v7
+- Fetch API
+- LocalStorage (for session persistence)
+
+---
+
+## 📄 Pages
+
+| Page | Route | Access |
+| :--- | :---- | :----- |
+| Home | `/` | Public |
+| Job Listings | `/jobs` | Public |
+| Job Detail | `/jobs/:id` | Public |
+| Company Profile | `/companies/:id` | Public |
+| Sign In | `/signin` | Public |
+| Register | `/register` | Public |
+| Seeker Dashboard | `/seeker/dashboard` | Seeker only |
+| Seeker Applications | `/seeker/applications` | Seeker only |
+| Seeker Profile | `/seeker/profile` | Seeker only |
+| Employer Dashboard | `/employer/dashboard` | Employer only |
+| Employer Applications | `/employer/applications` | Employer only |
+| Post a Job | `/employer/post-job` | Employer only |
+| Company Setup | `/employer/company-setup` | Employer only |
+
+---
+
+## 🚀 Getting Started
+
+```bash
+cd workbored-frontend
+npm install
+npm run dev
+```
+
+Create a `.env` file (copy from `.env.sample`):
+
+```
+VITE_API_URL=http://localhost:5000/api
+```
+
+Make sure the backend is running on port 5000 before starting the frontend.
