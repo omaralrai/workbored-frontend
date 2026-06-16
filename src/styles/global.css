@@ -146,7 +146,28 @@ button{font-family:inherit}
 .search-strip .field:last-of-type{border-right:0}
 .search-strip .field .lbl{font-size:11px;color:var(--grey);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .search-strip .field .val{font-size:14px;color:var(--text);font-weight:500;display:flex;align-items:center;gap:8px}
-.search-strip .btn-search{margin-left:8px;background:var(--primary);color:#fff;font-weight:600;font-size:13px;padding:12px 22px;border-radius:8px;border:0}
+.search-strip .btn-search{margin-left:8px;background:var(--primary);color:#fff;font-weight:600;font-size:13px;padding:12px 22px;border-radius:8px;border:0;cursor:pointer}
+.search-strip .btn-search:hover{background:var(--primary-hover)}
+
+/* Search strip interactive inputs */
+.search-input{border:0;outline:0;font-size:14px;font-weight:500;color:var(--text);background:transparent;width:100%;font-family:inherit;padding:0;line-height:1.4}
+.search-input::placeholder{color:var(--grey);font-weight:400}
+.search-input:focus{outline:none}
+.search-select{border:0;outline:0;font-size:14px;font-weight:500;color:var(--text);background:transparent;width:100%;font-family:inherit;padding:0;cursor:pointer;-webkit-appearance:none;appearance:none;line-height:1.4}
+.search-select:focus{outline:none}
+.search-select option{color:var(--text)}
+
+/* Dual-thumb salary range slider */
+.salary-slider-wrap{position:relative;height:20px;display:flex;align-items:center;margin-bottom:4px;--min-pct:0%;--max-pct:100%}
+.salary-range{position:absolute;width:100%;pointer-events:none;-webkit-appearance:none;appearance:none;height:4px;background:transparent;outline:none;top:50%;transform:translateY(-50%)}
+.salary-range::-webkit-slider-runnable-track{height:4px;border-radius:2px}
+.salary-range--low::-webkit-slider-runnable-track{background:linear-gradient(to right,var(--border) var(--min-pct),var(--primary) var(--min-pct),var(--primary) var(--max-pct),var(--border) var(--max-pct))}
+.salary-range--high::-webkit-slider-runnable-track{background:transparent}
+.salary-range::-webkit-slider-thumb{pointer-events:all;-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--primary);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer;margin-top:-6px}
+.salary-range::-moz-range-track{height:4px;border-radius:2px;background:var(--border)}
+.salary-range::-moz-range-thumb{pointer-events:all;width:16px;height:16px;border-radius:50%;background:var(--primary);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+.salary-range--high{z-index:2}
+.salary-range--low{z-index:1}
 
 /* Utility */
 .muted{color:var(--grey)}
